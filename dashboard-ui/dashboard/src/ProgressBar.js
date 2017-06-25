@@ -42,7 +42,17 @@ class ProgressBar extends Component {
 
     const points = this.props.appArr.map((app, i) => {
       const marginLeft = (i === this.props.appArr.length - 1) ? `${10 * (.99 + i)}%` :  `${10 * (1 + i)}%`;
-      return (i === this.props.appArr.length - 1) ? <div key={i} style={{...circleLast, marginLeft}} /> :  <div key={i} style={{...circle, marginLeft}} />
+      if(i === this.props.appArr.length - 1){
+        console.log(i);
+        if(i === 9) {
+          console.log('yo');
+          return <div key={i} style={{...circleLast, marginLeft, background:'rgb(99, 218, 9)'}} />
+        } else {
+          return <div key={i} style={{...circleLast, marginLeft}} />
+        }
+      } else {
+        return <div key={i} style={{...circle, marginLeft}} />
+      }
     })
 
     return (
