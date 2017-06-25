@@ -9,8 +9,19 @@ var httpServer = http.Server(app);
 var io = require('socket.io')(httpServer);
 
 app.set('port', (process.env.PORT || 5000));
-app.use(express.static(__dirname + '/public'));
+app.use(express.static('public'))
+app.use('/', express.static(__dirname + '/public'));
 app.use(bodyParser.json());
+
+const ap = {
+      name: 'Spotify',
+      description: `I can hear you compiling from the other side - Adele.js`,
+      img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2000px-Spotify_logo_without_text.svg.png',
+      index: '1',
+      total: '28',
+};
+
+var apps = [];
 
 var data = {
     str: "",
@@ -52,7 +63,10 @@ app.post('/update', function(req, res) {
         data.str = req.body.data;
         data.complete = true;
     }
-    res.end();
+
+    apps = [...apps, ap];
+    io.emit('data', {data: apps});
+    res.json({apps});
 });
 
 app.get('/end', function(req, res) {
@@ -86,6 +100,11 @@ app.post('/sentiment', function(req, res) {
 
     cloud[cloudPlatform].start();
     res.end();
+});
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+   io.emit('data', {data: apps});
 });
 
 app.listen(app.get('port'), function() {
