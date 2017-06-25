@@ -5,11 +5,13 @@
   "main": "backend/index.js",
   "dependencies": {
     "body-parser": "^1.17.2",
+    "cors": "^2.8.3",
     "express": "^4.15.3",
     "socket.io": "^2.0.3"
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node backend/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Freetail Hackers",

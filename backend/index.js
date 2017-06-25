@@ -1,41 +1,34 @@
-var http = require('http');
-var express = require('express');
+var express =  require('express');
 var app = express();
-var bodyParser = require('body-parser');
-var httpServer = http.Server(app);
-var io = require('socket.io')(httpServer);
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+app.use(express.static('public'))
 
-app.set('port', (process.env.PORT || 5000));
-app.use(express.static(__dirname + '/public'));
-app.use(bodyParser.json());
-
-var data = {
-    str: "",
-    complete: false
-};
-
-app.post('/start', function(req, res) {
-    console.log('start');
-    data.complete = false;
-    res.end();
-});
-
-app.post('/update', function(req, res) {
-    console.log('update: ' + JSON.stringify(req.body));
-    io.sockets.emit('data', req.body);
-    if (req.body.complete) {
-        data.str = req.body.str;
-        data.complete = true;
+const ap = {
+      name: 'Spotify',
+      description: `I can hear you compiling from the other side - Adele.js`,
+      img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2000px-Spotify_logo_without_text.svg.png',
+      index: '1',
+      total: '28',
     }
-    res.end();
+
+    var apps = [];
+
+
+app.use('/', express.static(__dirname + '/public'));
+
+app.get('/update', (req, res) => {
+   apps = [...apps, ap];
+   io.emit('data', {data: apps});
+   res.json({apps});
+})
+
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+   io.emit('data', {data: apps});
 });
 
-app.get('/end', function(req, res) {
-    res.json(data);
-    data.str = "";
-    data.complete = false;
-});
-
-app.listen(app.get('port'), function() {
-    console.log('Node app is running on port', app.get('port'));
+http.listen(4000, function(){
+  console.log('listening on *:4000');
 });
