@@ -7,7 +7,7 @@ import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
-public class SMSListener extends BroadcastReceiver {
+public class SMSReceiver extends BroadcastReceiver {
 
     private final String TAG = getClass().getSimpleName();
     private final String SMS_SENDER = "+19726628658";

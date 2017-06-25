@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hacktx.echoredux">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
     <application
@@ -19,7 +20,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".listener.SMSListener">
+        <receiver android:name=".listener.SMSReceiver">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
