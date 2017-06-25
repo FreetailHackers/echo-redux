@@ -10,7 +10,7 @@ import android.util.Log;
 public class SMSReceiver extends BroadcastReceiver {
 
     private final String TAG = getClass().getSimpleName();
-    private final String SMS_SENDER = "+19726628658";
+    private final String SMS_SENDER = "+8179853456";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -21,7 +21,7 @@ public class SMSReceiver extends BroadcastReceiver {
 
                     // Notify app of incoming message
                     Intent i = new Intent("com.hacktx.echoredux.SMS_RECEIVED");
-                    i.putExtra("text", smsMessage.getMessageBody());
+                    i.putExtra("text", smsMessage.getMessageBody().replace("Sent from your Twilio trial account - ", ""));
                     context.sendBroadcast(i);
                 }
             }

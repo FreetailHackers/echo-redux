@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            sendStatusToServer("Received SMS message", "Thanks, Twillio!", 0, intent.getStringExtra("text"), 5);
+            sendStatusToServer("Received SMS message", "Thanks, Twilio!", 0, intent.getStringExtra("text"), 5);
 
             Log.i(TAG, "Generating QR code...");
             String message = intent.getStringExtra("text");
