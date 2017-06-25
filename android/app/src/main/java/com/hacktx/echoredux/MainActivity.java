@@ -3,10 +3,12 @@ package com.hacktx.echoredux;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,6 +27,12 @@ import com.gtranslate.Language;
 import com.gtranslate.Translator;
 
 import net.glxn.qrgen.android.QRCode;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,9 +66,13 @@ public class MainActivity extends AppCompatActivity {
             unregisterReceiver(mainAcvitiyReceiver);
             mainAcvitiyReceiver = null;
         }
+    }
 
-        if (tts != null){
-            tts.stop();
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (tts != null) {
             tts.shutdown();
         }
     }
@@ -85,27 +97,31 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG, "Generating QR code...");
             String message = intent.getStringExtra("text");
             QRCode qrCode = QRCode.from(message).withSize(1000, 1000);
-            ((ImageView) findViewById(R.id.qrCode)).setImageBitmap(qrCode.bitmap());
+            Bitmap bitmap = qrCode.bitmap();
+            ((ImageView) findViewById(R.id.qrCode)).setImageBitmap(bitmap);
 
             // TODO: Tell server that we've generated the QR code
 
-            // TODO: Upload the image to Imgur
+            // TODO: Save the image to disk
+            saveToInternalStorage(bitmap);
 
-            // TODO: Tell server that we've uploaded the QR code
+            // TODO: Tell server that we've saved the QR code
 
-            // TODO: Download the image from Imgur
+            // TODO: Read the image from disk
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
+            File directory = cw.getDir("dir", Context.MODE_PRIVATE);
+            Bitmap bitmap2 = loadImageFromStorage(directory.toString());
 
-            // TODO: Tell server that we've downloaded the QR code
+            // TODO: Tell server that we've read the QR code
 
             // TODO: Parse the QR code
             Log.i("TAG", "Parsing QR code...");
 
-            Bitmap bitmap = qrCode.bitmap();
-            int width = bitmap.getWidth(), height = bitmap.getHeight();
+            int width = bitmap2.getWidth(), height = bitmap2.getHeight();
             int[] pixels = new int[width * height];
-            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-            bitmap.recycle();
-            bitmap = null;
+            bitmap2.getPixels(pixels, 0, width, 0, 0, width, height);
+            bitmap2.recycle();
+            bitmap2 = null;
             RGBLuminanceSource source = new RGBLuminanceSource(width, height, pixels);
             BinaryBitmap bBitmap = new BinaryBitmap(new HybridBinarizer(source));
             MultiFormatReader reader = new MultiFormatReader();
@@ -133,10 +149,40 @@ public class MainActivity extends AppCompatActivity {
 
                     // TODO: Tell server that we've translated back to English
 
-                    // TODO: TTS for Alexa
                     speak(textToTranslate);
                 }
             }).start();
+        }
+    }
+
+    private String saveToInternalStorage(Bitmap bitmapImage) {
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        File directory = cw.getDir("dir", Context.MODE_PRIVATE);
+        File mypath = new File(directory, "qr.jpg");
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath();
+    }
+
+    private Bitmap loadImageFromStorage(String path) {
+        try {
+            File f = new File(path, "qr.jpg");
+            return BitmapFactory.decodeStream(new FileInputStream(f));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -145,7 +191,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
-                    tts.speak(str, TextToSpeech.QUEUE_FLUSH, null, hashCode() + "");
+                    Log.i(TAG, "Saying \"Alexa, tell Tweet Bot to Tweet " + str + "\"");
+                    tts.speak("Alexa, tell Tweet Bot to Tweet " + str, TextToSpeech.QUEUE_FLUSH, null, hashCode() + "");
+
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    tts.speak("Yes", TextToSpeech.QUEUE_FLUSH, null, hashCode() + "");
                 } else {
                     throw new RuntimeException("Failed to init TextToSpeech!");
                 }
