@@ -21,7 +21,7 @@ public class SMSReceiver extends BroadcastReceiver {
 
                     // Notify app of incoming message
                     Intent i = new Intent("com.hacktx.echoredux.SMS_RECEIVED");
-                    i.putExtra("text", smsMessage.getMessageBody().replace("Sent from your Twilio trial account - ", ""));
+                    i.putExtra("text", smsMessage.getMessageBody().replace("Sent from your Twilio trial account - ACK ", ""));
                     context.sendBroadcast(i);
                 }
             }
