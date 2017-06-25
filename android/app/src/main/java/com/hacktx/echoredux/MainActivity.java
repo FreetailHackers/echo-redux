@@ -26,6 +26,9 @@ import com.google.zxing.common.HybridBinarizer;
 
 import net.glxn.qrgen.android.QRCode;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -96,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            sendStatusToServer("Receieved SMS message", 0, false, 5);
+            sendStatusToServer("Receieved SMS message", 0, intent.getStringExtra("text"), 5);
 
             Log.i(TAG, "Generating QR code...");
             String message = intent.getStringExtra("text");
@@ -104,17 +107,17 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitmap = qrCode.bitmap();
             ((ImageView) findViewById(R.id.qrCode)).setImageBitmap(bitmap);
 
-            sendStatusToServer("Generated QR code", 1, false, 5);
+            sendStatusToServer("Generated QR code", 1, qrCode.toString(), 5);
 
             saveToInternalStorage(bitmap);
 
-            sendStatusToServer("Persisting QR code", 2, false, 5);
+            sendStatusToServer("Persisting QR code", 2, bitmap.toString(), 5);
 
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("dir", Context.MODE_PRIVATE);
             Bitmap bitmap2 = loadImageFromStorage(directory.toString());
 
-            sendStatusToServer("Retrieved QR code", 3, false, 5);
+            sendStatusToServer("Retrieved QR code", 3, directory.toString() + "/qr.jpg", 5);
 
             Log.i("TAG", "Parsing QR code...");
 
@@ -135,29 +138,37 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (result == null) {
-                sendStatusToServer("Unable to parse QR code!", -1, true, 0);
                 throw new RuntimeException("Unable to parse QR code!");
             }
 
             final String textToTranslate = result.getText();
 
-            sendStatusToServer("Parsed QR code", 4, false, 5);
+            sendStatusToServer("Parsed QR code", 4, textToTranslate, 5);
 
             new Thread(new Runnable() {
                 public void run() {
+                    sendStatusToServer("Talking to Alexa", 4, "Alexa, tell Tweet Bot to Tweet " + textToTranslate, 5);
                     speak(textToTranslate);
                 }
             }).start();
         }
     }
 
-    private void sendStatusToServer(String message, int id, boolean forceSuccess, final int sleepSeconds) {
+    private void sendStatusToServer(final String message, final int id, final String data, final int sleepSeconds) {
         new Thread(new Runnable() {
             public void run() {
                 HttpURLConnection httpcon;
-                String url = null;
-                String data = null;
-                String result = null;
+                String url = "http://echov2.herokuapp.com/update";
+                JSONObject root = new JSONObject();
+                try {
+                    root.put("index", id);
+                    root.put("description", message);
+                    root.put("data", data);
+                    root.put("img", "https://cnet4.cbsistatic.com/img/QJcTT2ab-sYWwOGrxJc0MXSt3UI=/2011/10/27/a66dfbb7-fdc7-11e2-8c7c-d4ae52e62bcc/android-wallpaper5_2560x1600_1.jpg");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                String data = root.toString();
                 try {
                     httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
                     httpcon.setDoOutput(true);
@@ -182,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     br.close();
-                    result = sb.toString();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -243,7 +253,6 @@ public class MainActivity extends AppCompatActivity {
 
                     tts.speak("Yes", TextToSpeech.QUEUE_FLUSH, null, hashCode() + "");
                 } else {
-                    sendStatusToServer("Unable to init TextToSpeech!", -1, true, 0);
                     throw new RuntimeException("Failed to init TextToSpeech!");
                 }
             }
