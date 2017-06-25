@@ -9,7 +9,8 @@ var message;
 
 web.groups.history('G5YCZV06L').then((history) => {
 	if(history.messages[0].user != otherbot){			//find out user id
-		respond(message = history.messages[0].text);
+		message = history.messages[0].text;
+		respond(message);
 	}
 });
 
