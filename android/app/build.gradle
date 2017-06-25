@@ -29,6 +29,4 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
     compile 'com.github.kenglxn.QRGen:android:2.2.0'
     testCompile 'junit:junit:4.12'
-
-    compile files('libs/gtranslateapi-1.0.jar')
 }
