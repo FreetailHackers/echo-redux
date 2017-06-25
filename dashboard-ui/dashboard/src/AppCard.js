@@ -8,8 +8,12 @@ class AppCard extends Component {
   render() {
     
     const textStyle = {textAlign: 'center'}
+    const otherStyle ={
+      position: 'absolute',
+      marginTop: `${this.props.index * 1}em`
+    }
     return (
-        <Row className='floating'>
+        <Row className='slideRight' style={otherStyle}>
           <Col md={{ size: 4, offset: 4 }}>
             <Card block >
               <Img src={this.props.app.img}/>

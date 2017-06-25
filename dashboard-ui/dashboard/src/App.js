@@ -29,7 +29,7 @@ class App extends Component {
     return (
       <div className='container'>
         <ProgressBar appArr={this.state.apps} />
-        {this.state.apps.length === 0 ? <div>Nothing Yet</div> :  <AppCard app={this.state.apps[this.state.apps.length - 1]} /> }
+        {this.state.apps.length === 0 ? <div>Nothing Yet</div> :  this.state.apps.map((bruh, index) => <AppCard app={bruh} index={index} />) }
       </div>
   );
   }
