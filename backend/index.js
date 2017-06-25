@@ -2,18 +2,18 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var sentiment = require('sentiment');
 
+const port = process.env.PORT || 4000;
 var http = require('http');
 var express = require('express');
 var app = express();
 var httpServer = http.Server(app);
 var io = require('socket.io')(httpServer);
 
-app.set('port', (process.env.PORT || 5000));
 app.use(express.static('public'))
 app.use('/', express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
-const ap = {
+var OLD = {
       name: 'Spotify',
       description: `I can hear you compiling from the other side - Adele.js`,
       img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2000px-Spotify_logo_without_text.svg.png',
@@ -28,6 +28,13 @@ var data = {
     complete: false
 };
 
+
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+   io.emit('data', {data: apps});
+});
+
 app.post('/start', function(req, res) {
     console.log(req.body);
     data.str = req.body.str;
@@ -40,15 +47,14 @@ app.post('/start', function(req, res) {
 
 app.post('/update', function(req, res) {
     console.log('update: ' + JSON.stringify(req.body));
-    io.sockets.emit('data', req.body);
     if (req.body.complete) {
         data.str = req.body.data;
         data.complete = true;
     }
-
+    const ap = req.body;       
     apps = [...apps, ap];
     io.emit('data', {data: apps});
-    res.json({apps});
+    res.json({apps}); 
 });
 
 app.get('/end', function(req, res) {
@@ -88,11 +94,8 @@ app.post('/sentiment', function(req, res) {
     res.end();
 });
 
-io.on('connection', function(socket){
-  console.log('a user connected');
-   io.emit('data', {data: apps});
-});
 
-app.listen(app.get('port'), function() {
-    console.log('Node app is running on port', app.get('port'));
+
+httpServer.listen(port, function() {
+    console.log('Node app is running on port', port);
 });

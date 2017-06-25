@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	URL = os.Getenv("BASE_URL") + "end"
+	URL string
 )
 
 func main() {
+	URL = os.Args[1] + "end"
 	for {
 		time.Sleep(2 * time.Second)
 		if hasEnded() {
