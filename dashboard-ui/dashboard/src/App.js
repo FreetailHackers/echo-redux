@@ -10,7 +10,7 @@ class App extends Component {
 
   constructor(props) {
     super(props)
-    const socket = io('http://localhost:4000')
+    const socket = io()
     this.state = {apps: []}
     socket.on('data', (payload) => {   
       this.updateCodeFromSockets(payload)
@@ -25,7 +25,6 @@ class App extends Component {
   }
 
   render() { 
-    
 
     return (
       <div className='container'>

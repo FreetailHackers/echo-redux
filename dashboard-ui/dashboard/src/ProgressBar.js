@@ -20,7 +20,7 @@ class ProgressBar extends Component {
       transition: 'width 1s',
       background: 'rgb(99, 218, 9)',
       height: '100%',
-      width: `${this.props.appArr.length / 5 * 100}%`,
+      width: `${this.props.appArr.length / 10 * 100}%`,
     }
 
     const circle = {
@@ -41,8 +41,8 @@ class ProgressBar extends Component {
       width: '25px'}
 
     const points = this.props.appArr.map((app, i) => {
-      const marginLeft = (i === this.props.appArr.length - 1) ? `${20 * (.99 + i)}%` :  `${20 * (1 + i)}%`;
-      return (i === this.props.appArr.length - 1) ? <div className='pulse' key={i} style={{...circleLast, marginLeft}} /> :  <div key={i} style={{...circle, marginLeft}} />
+      const marginLeft = (i === this.props.appArr.length - 1) ? `${10 * (.99 + i)}%` :  `${10 * (1 + i)}%`;
+      return (i === this.props.appArr.length - 1) ? <div key={i} style={{...circleLast, marginLeft}} /> :  <div key={i} style={{...circle, marginLeft}} />
     })
 
     return (

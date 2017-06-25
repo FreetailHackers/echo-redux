@@ -17,7 +17,7 @@ class AppCard extends Component {
               <CardText> <i>{this.props.app.description}</i> </CardText>
               <Card block style={textStyle}> 
                 <code>
-                  Hello, World!
+                  {this.props.app.data}
                 </code>  
               </Card>
             </Card>
