@@ -2,9 +2,7 @@
 
 function echov2() {
   curl -H "Content-Type: application/json" -X POST -d "$(ruby jsonify.rb $@)" http://localhost:5000/start > /dev/null 2>&1
-  go run poll.go > text.txt
-  cat text.txt
-  rm text.txt
+  go run poll.go
 }
 
 if [ $# -eq 0 ]

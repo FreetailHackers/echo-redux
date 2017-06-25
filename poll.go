@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	URL = "http://echov2.herokuapp.com/end"
+	//URL = "http://echov2.herokuapp.com/end"
+	URL = "http://localhost:5000/end"
 )
 
 func main() {
@@ -29,15 +30,17 @@ type State struct {
 func hasEnded() bool {
 	r, err := http.Get(URL)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Got error: %s", err)
+		fmt.Fprintf(os.Stderr, "Got error: %s\n", err)
 		return true
 	}
 	defer r.Body.Close()
 	appState := State{}
 	if err := json.NewDecoder(r.Body).Decode(&appState); err != nil {
-		fmt.Fprintf(os.Stderr, "Got error: %s", err)
+		fmt.Fprintf(os.Stderr, "Got error: %s\n", err)
 		return true
 	}
-	fmt.Println(appState.Str)
+	if appState.Complete {
+		fmt.Println(appState.Str)
+	}
 	return appState.Complete
 }
