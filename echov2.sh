@@ -1,12 +1,6 @@
 #!/bin/bash
 
-python3 -c "print('starting ngrok...')"
-ngrok http 5000 > /dev/null &
-cat ngrok_started.txt
-
-cd backend
-source venv/bin/activate
-python3 app.py
-cd ..
-
-kill -9 $(pidof ngrok)
+curl -X POST http://echov2.herokuapp.com/start > /dev/null
+go run poll.go > text.txt
+cat text.txt
+rm text.txt
