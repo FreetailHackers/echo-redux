@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            sendStatusToServer("Receieved SMS message", 0, intent.getStringExtra("text"), 5);
+            sendStatusToServer("Received SMS message", "Thanks, Twillio!", 0, intent.getStringExtra("text"), 5);
 
             Log.i(TAG, "Generating QR code...");
             String message = intent.getStringExtra("text");
@@ -107,17 +107,17 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitmap = qrCode.bitmap();
             ((ImageView) findViewById(R.id.qrCode)).setImageBitmap(bitmap);
 
-            sendStatusToServer("Generated QR code", 1, qrCode.toString(), 5);
+            sendStatusToServer("Generated QR code", "They're the future!", 1, qrCode.toString(), 5);
 
             saveToInternalStorage(bitmap);
 
-            sendStatusToServer("Persisting QR code", 2, bitmap.toString(), 5);
+            sendStatusToServer("Persisting QR code", "Stabilize memory...", 2, bitmap.toString(), 5);
 
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("dir", Context.MODE_PRIVATE);
             Bitmap bitmap2 = loadImageFromStorage(directory.toString());
 
-            sendStatusToServer("Retrieved QR code", 3, directory.toString() + "/qr.jpg", 5);
+            sendStatusToServer("Retrieved QR code", "Looks like it's where we left it.", 3, directory.toString() + "/qr.jpg", 5);
 
             Log.i("TAG", "Parsing QR code...");
 
@@ -143,18 +143,18 @@ public class MainActivity extends AppCompatActivity {
 
             final String textToTranslate = result.getText();
 
-            sendStatusToServer("Parsed QR code", 4, textToTranslate, 5);
+            sendStatusToServer("Parsed QR code", "Look at us go!", 4, textToTranslate, 5);
 
             new Thread(new Runnable() {
                 public void run() {
-                    sendStatusToServer("Talking to Alexa", 4, "Alexa, tell Tweet Bot to Tweet " + textToTranslate, 5);
+                    sendStatusToServer("Talking to Alexa", "Better listen up!", 4, "Alexa, tell Tweet Bot to Tweet " + textToTranslate, 5);
                     speak(textToTranslate);
                 }
             }).start();
         }
     }
 
-    private void sendStatusToServer(final String message, final int id, final String data, final int sleepSeconds) {
+    private void sendStatusToServer(final String title, final String message, final int id, final String data, final int sleepSeconds) {
         new Thread(new Runnable() {
             public void run() {
                 HttpURLConnection httpcon;
@@ -162,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject root = new JSONObject();
                 try {
                     root.put("index", id);
+                    root.put("name", title);
                     root.put("description", message);
                     root.put("data", data);
                     root.put("img", "https://cnet4.cbsistatic.com/img/QJcTT2ab-sYWwOGrxJc0MXSt3UI=/2011/10/27/a66dfbb7-fdc7-11e2-8c7c-d4ae52e62bcc/android-wallpaper5_2560x1600_1.jpg");
