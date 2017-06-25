@@ -8,9 +8,8 @@ import (
 	"time"
 )
 
-const (
-	//URL = "http://echov2.herokuapp.com/end"
-	URL = "http://localhost:5000/end"
+var (
+	URL = os.Getenv("BASE_URL") + "end"
 )
 
 func main() {

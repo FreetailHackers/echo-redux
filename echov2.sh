@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function echov2() {
-  curl -H "Content-Type: application/json" -X POST -d "$(ruby jsonify.rb $@)" http://localhost:5000/start > /dev/null 2>&1
+  curl -H "Content-Type: application/json" -X POST -d "$(ruby jsonify.rb $@)" ${BASE_URL}start > /dev/null 2>&1
   go run poll.go
 }
 

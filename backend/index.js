@@ -28,24 +28,6 @@ var data = {
     complete: false
 };
 
-var cloud = {
-    "AWS": {
-        start: function() {
-            console.log("Starting AWS");
-        }
-    },
-    "GCP": {
-        start: function() {
-            console.log("Starting GCP");
-        }
-    },
-    "Azure": {
-        start: function() {
-            console.log("Starting Azure");
-        }
-    }
-};
-
 app.post('/start', function(req, res) {
     console.log(req.body);
     data.str = req.body.str;
@@ -78,14 +60,19 @@ app.get('/end', function(req, res) {
 app.post('/sentiment', function(req, res) {
     var text = req.body.str;
     var textSentiment = sentiment(text).comparative;
-    var cloudPlatform = textSentiment < 0 ? "AWS" : "Azure";
     if (Math.abs(textSentiment) <= 0.1) {
-        cloudPlatform = "GCP";
+        text += ' :|';
+    } else if (textSentiment < 0) {
+        text += ' :(';
+    } else {
+        text += ' :)';
     }
 
     var update = {
-        data: "Sentiment analysis finished: Score: " + textSentiment + ". Starting a " + cloudPlatform + " instance.",
-        timestamp: new Date().toISOString()
+        name: 'Sentiment Analysis',
+        img: 'http://www.polyvista.com/blog/wp-content/uploads/2015/06/sentiment-customer-exp-large.png',
+        data: text,
+        description: "Sentiment analysis finished: Score: " + textSentiment + "."
     };
     request({
         url: 'http://echov2.herokuapp.com/update',
@@ -98,7 +85,6 @@ app.post('/sentiment', function(req, res) {
         }
     });
 
-    cloud[cloudPlatform].start();
     res.end();
 });
 
